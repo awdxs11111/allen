@@ -4,7 +4,7 @@ name: ysm
 on:
   workflow_dispatch:
   schedule:
-     - cron: '0 0-7 * * *'
+     - cron: '3 1-13 * * *'
   watch:
     types: started
 jobs:
@@ -16,6 +16,7 @@ jobs:
         YSM_HD: ${{ secrets.YSM_HD }}    
         YSM_BD: ${{ secrets.YSM_BD }} 
         YSM2_BD: ${{ secrets.YSM2_BD }}   
+        YSM_TX: ${{ secrets.YSM_TX }}   
         TZ: Asia/shanghai
     steps:
       - name: Checkout

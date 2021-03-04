@@ -1,10 +1,10 @@
-name: fqkk
+name: xsmm
 
 
 on:
   workflow_dispatch:
   schedule:
-     - cron: '2 1-11 * * *'
+     - cron: '13 */6 * * *'
   watch:
     types: started
 jobs:
@@ -12,13 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.repository.owner.id == github.event.sender.id
     env:
-        FQKK_URL: ${{ secrets.FQKK_URL }}
-        FQKK_HD: ${{ secrets.FQKK_HD }}       
+        XSMM_URL: ${{ secrets.XSMM_URL }}
+        XSMM_HD: ${{ secrets.XSMM_HD }}    
         TZ: Asia/shanghai
     steps:
       - name: Checkout
         uses: actions/checkout@v1
-        
       - name: Use Node.js 12.x
         uses: actions/setup-node@v1
         with:
@@ -26,10 +25,10 @@ jobs:
       - name: npm install
         run: |
           npm install
-      - name: '运行 【fqkk】'
-        if: env.FQKK_HD
+      - name: '运行 【xsmm】'
+        if: env.XSMM_HD
         run: |
-          node task/fqkk.js
+          node task/xsmm.js
         env:
           PUSH_KEY: ${{ secrets.PUSH_KEY }}
           BARK_PUSH: ${{ secrets.BARK_PUSH }}

@@ -1,227 +1,160 @@
 /*
-软件名称:云扫码 微信扫描二维码打开
-更新时间：2021-02-28 @肥皂
-脚本说明：云扫码自动阅读
-脚本为自动完成云扫码的阅读任务
-每日收益1元左右，可多号撸。提现秒到
-类似番茄看看，番茄看看黑了就跑云扫码，云扫码黑了就跑番茄看看
-哈哈哈啊哈哈哈哈
+软件名称:悬赏喵喵 微信小程序
+更新时间：2021-03-04 @肥皂
+脚本说明：悬赏喵喵自动任务和喂养
+脚本为自动完成悬赏喵喵的视频任务
+试玩小程序任务和自动喂养
+一天可能一块钱左右，30金豆一元
+猫粮足够可能一天两块左右
 
-任务打开二维码地址 https://raw.githubusercontent.com/age174/-/main/3B7C4F94-B961-4690-8DF7-B27998789124.png
+小程序二维码地址 https://raw.githubusercontent.com/age174/-/main/77D29956-8318-43D2-A7BC-0EF3E09F76AA.png
 微信扫描打开，保存临时码，再去扫码获取数据
 
 
 
 本脚本以学习为主！
-首次运行脚本，会提示获取数据
-去云扫码，点击开始阅读，阅读几秒返回结算成功获取数据
+使用方法:
+打开悬赏喵喵小程序，获得悬赏喵喵的数据，
+如果不行请点击右上角三个点，重新进入小程序
+
+请在登录之后再获取数据，先别多账号，怕有ip限制，慢慢试，提现了再多账号
+数据获取必须要在首页获取的才有效
+
 
 TG电报群: https://t.me/hahaha802
+
+
 
 boxjs地址 :  
 
 https://raw.githubusercontent.com/age174/-/main/feizao.box.json
 
 
-云扫码
+悬赏喵喵
 圈X配置如下，其他软件自行测试，定时可以多设置几次，没任务会停止运行的
 [task_local]
-#云扫码
-15 12,14,16,20,22 * * * https://raw.githubusercontent.com/age174/-/main/ysm.js, tag=云扫码, img-url=https://s3.ax1x.com/2021/02/28/6CRWb8.jpg, enabled=true
+#悬赏喵喵
+15 0,6,12,18, * * * https://raw.githubusercontent.com/age174/-/main/xsmm.js, tag=悬赏喵喵, img-url=https://raw.githubusercontent.com/erdongchanyo/icon/main/taskicon/Yunsaoma.png, enabled=true
 
 
 [rewrite_local]
-#云扫码
-^http://.*./yunonline/v1/ url script-request-body https://raw.githubusercontent.com/age174/-/main/ysm.js
+#悬赏喵喵
+https://vip.75787.com/app/index.php url script-request-header https://raw.githubusercontent.com/age174/-/main/xsmm.js
 
 
 
 #loon
-^http://.*./yunonline/v1/ script-path=https://raw.githubusercontent.com/age174/-/main/ysm.js, requires-body=true, timeout=10, tag=云扫码
+https://vip.75787.com/app/index.php script-path=https://raw.githubusercontent.com/age174/-/main/xsmm.js, requires-header=true, timeout=10, tag=悬赏喵喵
 
 
 
 #surge
 
-云扫码 = type=http-request,pattern=^http://.*./yunonline/v1/,requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/age174/-/main/ysm.js,script-update-interval=0
+悬赏喵喵 = type=http-request,pattern=https://vip.75787.com/app/index.php,requires-header=1,max-size=0,script-path=https://raw.githubusercontent.com/age174/-/main/xsmm.js,script-update-interval=0
 
 
 
 
 [MITM]
-hostname = .*.top
+hostname = vip.75787.com
 
 
 */
 
 
-const $ = new Env('云扫码自动阅读');
+const $ = new Env('悬赏喵喵');
 let status;
-status = (status = ($.getval("ysmstatus") || "1") ) > 1 ? `${status}` : ""; // 账号扩展字符
-let ysmurlArr = [], ysmhdArr = [],ysmbodyArr = [],ysm2bodyArr = [],ysmtxArr = [],ysmcount = ''
-let ysmurl = $.getdata('ysmurl')
-let ysmhd = $.getdata('ysmhd')
-let ysmbody = $.getdata('ysmbody')
-let ysm2body = $.getdata('ysm2body')
-let ysmtx = $.getdata('ysmtx')
-let ysmkey = ''
-let max = 30;
-let min = 10;
-
+status = (status = ($.getval("xsmmstatus") || "1") ) > 1 ? `${status}` : ""; // 账号扩展字符
+let xsmmurlArr = [], xsmmhdArr = [],xsmmcount = ''
+let xsmmurl = $.getdata('xsmmurl')
+let xsmmhd = $.getdata('xsmmhd')
+let xsmmmc = '',xsmmid = '',xsmm1 = ''
 
 if ($.isNode()) {
-   if (process.env.YSM_URL && process.env.YSM_URL.indexOf('#') > -1) {
-   ysmurlArr = process.env.YSM_URL.split('#');
-   console.log(`您选择的是用"#"隔开\n`)
-  }
-  else if (process.env.YSM_URL && process.env.YSM_URL.indexOf('\n') > -1) {
-   ysmurlArr = process.env.YSM_URL.split('\n');
+   if (process.env.XSMM_URL && process.env.XSMM_URL.indexOf('\n') > -1) {
+   xsmmurlArr = process.env.XSMM_URL.split('\n');
    console.log(`您选择的是用换行隔开\n`)
   } else {
-   ysmurlArr = process.env.YSM_URL.split()
+   xsmmurlArr = process.env.XSMM_URL.split()
   };
-  if (process.env.YSM_HD && process.env.YSM_HD.indexOf('#') > -1) {
-   ysmhdArr = process.env.YSM_HD.split('#');
-   console.log(`您选择的是用"#"隔开\n`)
-  }
-  else if (process.env.YSM_HD && process.env.YSM_HD.indexOf('\n') > -1) {
-   ysmhdArr = process.env.YSM_HD.split('\n');
+  if (process.env.XSMM_HD && process.env.XSMM_HD.indexOf('\n') > -1) {
+   xsmmhdArr = process.env.XSMM_HD.split('\n');
    console.log(`您选择的是用换行隔开\n`)
   } else {
-   ysmhdArr = process.env.YSM_HD.split()
+   xsmmhdArr = process.env.XSMM_HD.split()
   };
-  if (process.env.YSM_BD && process.env.YSM_BD.indexOf('#') > -1) {
-   ysmbodyArr = process.env.YSM_BD.split('#');
-   console.log(`您选择的是用"#"隔开\n`)
-  }
-  else if (process.env.YSM_BD && process.env.YSM_BD.indexOf('\n') > -1) {
-   ysmbodyArr = process.env.YSM_BD.split('\n');
-   console.log(`您选择的是用换行隔开\n`)
-  } else {
-   ysmbodyArr = process.env.YSM_BD.split()
-  };	
-  if (process.env.YSM2_BD && process.env.YSM2_BD.indexOf('#') > -1) {
-   ysm2bodyArr = process.env.YSM2_BD.split('#');
-   console.log(`您选择的是用"#"隔开\n`)
-  }
-  else if (process.env.YSM2_BD && process.env.YSM2_BD.indexOf('\n') > -1) {
-   ysm2bodyArr = process.env.YSM2_BD.split('\n');
-   console.log(`您选择的是用换行隔开\n`)
-  } else {
-   ysm2bodyArr = process.env.YSM2_BD.split()
-  };		
-  if (process.env.YSM_TX && process.env.YSM_TX.indexOf('#') > -1) {
-   ysmtxArr = process.env.YSM_TX.split('#');
-   console.log(`您选择的是用"#"隔开\n`)
-  }
-  else if (process.env.YSM_TX && process.env.YSM_TX.indexOf('\n') > -1) {
-   ysmtxArr = process.env.YSM_TX.split('\n');
-   console.log(`您选择的是用换行隔开\n`)
-  } else {
-   ysmtxArr = process.env.YSM_TX.split()
-  };	
 	
     console.log(`============ 脚本执行-国际标准时间(UTC)：${new Date().toLocaleString()}  =============\n`)
     console.log(`============ 脚本执行-北京时间(UTC+8)：${new Date(new Date().getTime() + 8 * 60 * 60 * 1000).toLocaleString()}  =============\n`)
- } else {ysmurlArr.push($.getdata('ysmurl'))
-    ysmhdArr.push($.getdata('ysmhd'))
-    ysmbodyArr.push($.getdata('ysmbody'))
-    ysm2bodyArr.push($.getdata('ysm2body'))
-    ysmtxArr.push($.getdata('ysmtx'))
-    let ysmcount = ($.getval('ysmcount') || '1');
-  for (let i = 2; i <= ysmcount; i++) {
-    ysmurlArr.push($.getdata(`ysmurl${i}`))
-    ysmhdArr.push($.getdata(`ysmhd${i}`))
-    ysmbodyArr.push($.getdata(`ysmbody${i}`))
-    ysm2bodyArr.push($.getdata(`ysm2body${i}`))
-    ysmtxArr.push($.getdata(`ysmtx${i}`))
+ } else {xsmmurlArr.push($.getdata('xsmmurl'))
+    xsmmhdArr.push($.getdata('xsmmhd'))
+    let xsmmcount = ($.getval('xsmmcount') || '1');
+  for (let i = 2; i <= xsmmcount; i++) {
+    xsmmurlArr.push($.getdata(`xsmmurl${i}`))
+    xsmmhdArr.push($.getdata(`xsmmhd${i}`))
   }
 }
 
 
 
 !(async () => {
-if (!ysmhdArr[0]) {
-    $.msg($.name, '【提示】请先获取云扫码一cookie')
+if (!xsmmhdArr[0]) {
+    $.msg($.name, '【提示】请先获取一cookie')
     return;
   }
-    console.log(`------------- 共${ysmhdArr.length}个账号-------------\n`)
-      for (let i = 0; i < ysmhdArr.length; i++) {
-        if (ysmhdArr[i]) {
+    console.log(`------------- 共${xsmmhdArr.length}个账号-------------\n`)
+      for (let i = 0; i < xsmmhdArr.length; i++) {
+        if (xsmmhdArr[i]) {
          
-          ysmurl = ysmurlArr[i];
-          ysmhd = ysmhdArr[i];
-          ysmbody = ysmbodyArr[i];
-          ysm2body = ysm2bodyArr[i];
-          ysmtx = ysmtxArr[i];
+          xsmmurl = xsmmurlArr[i];
+          xsmmhd = xsmmhdArr[i];
           $.index = i + 1;
-          console.log(`\n开始【云扫码${$.index}】`)
-    await ysm1();
+          console.log(`\n开始【悬赏喵喵${$.index}】`)
+          await xsmmlb();
 
   }
-  //await ysmtx();
 }
 
 })()
   .catch((e) => $.logErr(e))
   .finally(() => $.done())
-//云扫码数据获取
+//悬赏喵喵数据获取
 
 
-function ysmck() {
-   if ($request.url.indexOf("v1/task") > -1) {
- const ysmurl = $request.url
-  if(ysmurl)     $.setdata(ysmurl,`ysmurl${status}`)
-    $.log(ysmurl)
-  const ysmhd = JSON.stringify($request.headers)
-        if(ysmhd)    $.setdata(ysmhd,`ysmhd${status}`)
-$.log(ysmhd)
-   const ysmbody = JSON.stringify($request.body)
-        if(ysmbody)    $.setdata(ysmbody,`ysmbody${status}`)
-$.log(ysmbody)
-   $.msg($.name,"",'云扫码'+`${status}` +'获取任务数据获取成功！')
+function xsmmck() {
+   if ($request.url.indexOf("action=index") > -1) {
+ const xsmmurl = $request.url
+  if(xsmmurl)     $.setdata(xsmmurl,`xsmmurl${status}`)
+    $.log(xsmmurl)
+  const xsmmhd = JSON.stringify($request.headers)
+        if(xsmmhd)    $.setdata(xsmmhd,`xsmmhd${status}`)
+$.log(xsmmhd)
+   $.msg($.name,"",'悬赏喵喵'+`${status}` +'获取数据获取成功！')
   }
-if ($request.url.indexOf("add_gold") > -1) {
- const ysm2body = $request.body
-  if(ysm2body)     $.setdata(ysm2body,`ysm2body${status}`)
-    $.log(ysm2body)
-$.msg($.name,"",'云扫码'+`${status}` +'提交任务数据获取成功！')
-   }
-  if ($request.url.indexOf("withdraw") > -1) {
- const ysmtx = $request.body
-  if(ysmtx)     $.setdata(ysmtx,`ysmtx${status}`)
-    $.log(ysmtx)
-$.msg($.name,"",'云扫码'+`${status}` +'微信提现数据获取成功！')
-   }
 }
 
 
-//云扫码领取
-function ysm3(timeout = 0) {
+//悬赏喵喵视频
+function xsmmsp(timeout = 0) {
   return new Promise((resolve) => {
 let url = {
-        url : "http:"+ysmurl.match(/http:(.*?)yunonline/)[1]+"yunonline/v1/add_gold",
-        headers : JSON.parse(ysmhd),
-        body : ysm2body,}
-      $.post(url, async (err, resp, data) => {
+        url : 'https://vip.75787.com/app/index.php'+xsmmurl.match(/index.php(.*?)action/)[1]+'&action=video&contr=food&token='+xsmmurl.match(/token=(\w+)/)[1]+'&version=2.0.32',
+        headers : JSON.parse(xsmmhd),
+        }
+      $.get(url, async (err, resp, data) => {
         try {
            
     const result = JSON.parse(data)
-        if(result.errcode == 0){
-        console.log('\n云扫码领取阅读奖励回执:成功🌝 '+result.data.gold+'\n今日阅读次数: '+result.data.day_read+' 今日阅读奖励: '+result.data.day_gold+' 当前余额'+result.data.last_gold+'\n')
-        if(result.data.last_gold >= 3000){
-    console.log('\n检测到当前金额可提现，前去执行提现,请去抓取提现的数据，如果没有提现数据脚本会自行终止!')                
-await ysmdh();
-}       await $.wait(2000);
-        await ysm1();
+        if(result.status == 1){
+        console.log('\n悬赏喵喵[领取视频奖励]回执:成功🌝 \n获得视频奖励: '+result.info.video_currency+' 猫粮')
+           await $.wait(11000);
+           await xsmmsp();
+       
         
 } else {
-       if(result.errcode == 405){
-console.log('\n🧼来自肥皂的提示:'+result.msg+'尝试继续执行任务')
-      await ysm1();
-}
-    console.log(result.errcode)
-console.log('\n云扫码领取阅读奖励回执:失败🚫 '+result.msg)
+     
+console.log('\n悬赏喵喵[领取视频奖励]回执:失败🚫当前无任务\n前去喂养悬赏喵喵🐱')
+      await xsmmwy();
 }
    
         } catch (e) {
@@ -233,29 +166,27 @@ console.log('\n云扫码领取阅读奖励回执:失败🚫 '+result.msg)
   })
 }
 
-//云扫码提交     
-function ysm2(timeout = 0) {
+//悬赏喵喵任务     
+function xsmmrw(timeout = 0) {
   return new Promise((resolve) => {
+
 let url = {
-        url : ysmkey,
-        headers : JSON.parse(ysmhd),
+        url : 'https://vip.75787.com/app/index.php'+xsmmurl.match(/index.php(.*?)action/)[1]+'&action=complete&contr=task&task_id='+xsmmid+'&token='+xsmmurl.match(/token=(\w+)/)[1]+'&version=2.0.32',
+        headers : JSON.parse(xsmmhd),
        
 }      
       $.get(url, async (err, resp, data) => {
         try {
-         //console.log('\n开始重定向跳转，跳转返回结果：'+data)
-        if (err) {
-          console.log(`\n${$.name} 🧼来自肥皂的提示:key请求提交失败,尝试重新执行任务`)
-     await ysm1();
+         const result = JSON.parse(data)
+        if (result.status == 1) {
+          console.log(`\n悬赏喵喵[试玩小程序任务]回执:成功🌝\n`+result.info.msg)
+     await $.wait(2000);
+     await xsmmlb();
         } else {
            
     //const result = JSON.parse(data)
-       console.log('\n云扫码key提交成功,10秒后开始领取阅读奖励') 
-        random = Math.floor(Math.random()*(max-min+1)+min)*1000
-        console.log(random);
-	await $.wait(random);     
-        //await $.wait(9000);
-        await ysm3(); 
+       console.log('\n悬赏喵喵[试玩小程序任务]回执:失败🚫') 
+       
        
         }} catch (e) {
           //$.logErr(e, resp);
@@ -267,34 +198,35 @@ let url = {
 }
 
 
-//云扫码key
-function ysm1(timeout = 0) {
+//悬赏喵喵列表
+function xsmmlb(timeout = 0) {
   return new Promise((resolve) => {
 let url = {
-        url : "http:"+ysmurl.match(/http:(.*?)yunonline/)[1]+"yunonline/v1/task",
-        headers : JSON.parse(ysmhd),
-        body : 'secret='+ysmbody.match(/secret=(.*?)&/)[1]+'&type=read',
+        url : xsmmurl,
+        headers : JSON.parse(xsmmhd),
+        
 }
-      $.post(url, async (err, resp, data) => {
+      $.get(url, async (err, resp, data) => {
         try {
-      if(data == '{"errcode":0,"msg":"success"}'){
-       console.log('\n🧼来自肥皂的提示:当前没有任务啊,手动进云扫码看看是不是一直显示更新中,别问肥皂什么原因啦～')
+
+if(data.match(/"s":(.*?),/)[1] === '[]'){
+console.log('\n悬赏喵喵当前没有小程序任务了,前去执行视频任务')
+await xsmmsp();
 }
-          //console.log(data)
     const result = JSON.parse(data)
-        if(result.errcode == 0){
-         //console.log(data)
-        console.log('\n云扫码获取key回执:成功🌝 开始 循环观看💦')
-      if(result.data.link === undefined){
-       console.log('\n🧼来自肥皂的提示:没有匹配到key'+result.data.msg)
-} else {
-        ysmkey = result.data.link
-        await ysm2();
-        await $.wait(1000);
-}
+        if(result.status == 1){
+     //console.log(data)
+      xsmmid = data.match(/"id":"(\w+)",/)[1]
+      xsmmmc = data.match(/"title":"(.+?)",/)[1]
+
+        console.log('\n悬赏喵喵[获取任务列表]回执:成功🌝  \n[任务ID]: '+xsmmid+' \n[任务名称]: '+xsmmmc+'\n开始领取任务奖励')
+     //$.done()
+       await $.wait(2000);
+        await xsmmrw();
         
 } else {
-console.log('云扫码获取key回执:失败🚫 '+result.msg+' 已停止当前账号运行!')
+console.log('悬赏喵喵[获取任务列表]回执:失败🚫 当前账号可能没有任务了')
+     await xsmmsp();
 }
         } catch (e) {
           //$.logErr(e, resp);
@@ -306,25 +238,22 @@ console.log('云扫码获取key回执:失败🚫 '+result.msg+' 已停止当前�
 }
 
 
-//云扫码兑换
-function ysmdh(timeout = 0) {
+//悬赏喵喵喂养
+function xsmmwy(timeout = 0) {
   return new Promise((resolve) => {
-
 let url = {
-        url : "http:"+ysmurl.match(/http:(.*?)yunonline/)[1]+"yunonline/v1/user_gold",
-        headers : JSON.parse(ysmhd),
-        body : 'openid='+ysmtx.match(/openid=(.*?)ua/)[1]+'gold=3000',
-}
-      $.post(url, async (err, resp, data) => {
+        url : 'https://vip.75787.com/app/index.php'+xsmmurl.match(/index.php(.*?)action/)[1]+'&action=feed&contr=my&token='+xsmmurl.match(/token=(\w+)/)[1]+'&is_remind=2&version=2.0.32',
+        headers : JSON.parse(xsmmhd),
+        }
+      $.get(url, async (err, resp, data) => {
         try {
            
     const result = JSON.parse(data)
-        if(result.errcode == 0){
-        console.log('\n云扫码提现兑换:成功🌝 兑换金额'+result.data.money+'元，前去微信提现')
-        await $.wait(1000);
-        await ysmwx();
+        if(result.status == 1){
+        console.log('\n悬赏喵喵[喂养]回执:成功🌝 \n成功添加喂养进度'+result.info.percentage+'%\n当前金豆余额:'+result.info.member.currency+' 个\n猫粮剩余:'+result.info.member.foodstuff)
+       
 } else {
-       console.log('\n云扫码提现兑换:失败🚫 '+result.msg)
+       console.log('\n悬赏喵喵[喂养]回执:失败🚫 '+result.info)
 }
    
         } catch (e) {
@@ -335,36 +264,6 @@ let url = {
     },timeout)
   })
 }
-
-
-//云扫码提现
-function ysmwx(timeout = 0) {
-  return new Promise((resolve) => {
-let url = {
-        url : "http:"+ysmurl.match(/http:(.*?)yunonline/)[1]+"yunonline/v1/withdraw",
-        headers : JSON.parse(ysmhd),
-        body : ysmtx,}
-      $.post(url, async (err, resp, data) => {
-        try {
-           
-    const result = JSON.parse(data)
-        if(result.errcode == 0){
-        console.log('\n云扫码微信提现回执:成功🌝 '+result.msg)
-        $.msg($.name,"",'云扫码已成功提现至微信0.3元')
-        await ysm1();
-} else {
-       console.log('\n云扫码微信提现回执:失败🚫 '+result.msg)
-}
-   
-        } catch (e) {
-          //$.logErr(e, resp);
-        } finally {
-          resolve()
-        }
-    },timeout)
-  })
-}
-
 
 
 

@@ -212,7 +212,7 @@ if (!hotsoonsignheaderArr[0]) {
       if (h%4 == 0) await treasure_task()
       await control()
       for (let j = 0; j < 3; j++) {
-      await tasklist()
+      //await profit()
       await spam()
       //await skill()
       await watch_video()
@@ -360,6 +360,32 @@ return new Promise((resolve, reject) => {
    })
   } 
 */
+
+//profit
+function profit() {
+return new Promise((resolve, reject) => {
+  let profiturl ={
+    url: `https://i-hl.snssdk.com/luckycat/hotsoon/v1/wallet/profit_detail_page?income_type=2&num=80&${hotsoonsignheader}`,
+    headers :JSON.parse(hotsoonsignkey),
+}
+   $.get(profiturl,(error, response, data) =>{
+     const result = JSON.parse(data)
+        if(logs)$.log(data)
+for(let i =0;i<=result.data.profit_detail.score_income_list.length;i++){
+if(result.data.profit_detail.score_income_list[i].desc.match(/\d+/)) {
+         no = result.data.profit_detail.score_income_list[i].desc.match(/\d+/)          
+$.log(no)
+         break;
+}
+}
+          resolve()
+    })
+   })
+  } 
+
+
+
+/*
 //tasklist
 function tasklist() {
 return new Promise((resolve, reject) => {
@@ -393,6 +419,10 @@ return new Promise((resolve, reject) => {
     })
    })
   }
+
+*/
+
+
 //skill
 /*function skill() {
 return new Promise((resolve, reject) => {
