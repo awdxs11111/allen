@@ -289,8 +289,9 @@ let url = {
        console.log('\n🧼来自肥皂的提示:没有匹配到key'+result.data.msg)
 } else {
         ysmkey = result.data.link
-        await ysm2();
+        //$.log(ysmkey)
         await $.wait(1000);
+        await ysm2();
 }
         
 } else {
