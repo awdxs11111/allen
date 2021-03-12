@@ -95,8 +95,8 @@ if (!hldsphdArr[0]) {
           hldsphd = hldsphdArr[i];
           $.index = i + 1;
           console.log(`\n开始【哈喽短视频${$.index}】`)
-          await hldspsp();
-            //await hldspqd();
+          //await hldspsp();
+            await hldspqd();
             
   }
 }
@@ -133,7 +133,7 @@ let url = {
         try {
            
     const result = JSON.parse(data)
-    console.log('【result】：'+result)
+    //console.log('【result】：'+result)
         if(result.data !== 0){
         console.log('\n哈喽短视频[领取视频红包]回执:成功🌝 \n获得视频奖励: '+result.data+'等待20秒继续领取')
            await $.wait(20000);
