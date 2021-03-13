@@ -217,7 +217,7 @@ let url = {
        console.log('\n番茄看看key提交成功,即将开始领取阅读奖励') 
 	await fqread();
         random = Math.floor(Math.random()*(max-min+1)+min)*1000
-        console.log(random);
+        console.log("随机延时"+random+"毫秒");
 	await $.wait(random);       
        // await $.wait(15000);
         await fqkk3(); 
