@@ -66,6 +66,8 @@ let times = Math.round(Date.now() / 1000)
 let wkzzurl = $.getdata('wkzzurl')
 let wkzzhd = $.getdata('wkzzhd')
 let wkzzkey = '',id = '',uid='',tid='',name=''
+let max = 60
+let min = 17
 
 if ($.isNode()) {
   if (process.env.WKZZ_HD && process.env.WKZZ_HD.indexOf('\n') > -1) {
@@ -209,7 +211,9 @@ let url = {
             $.logErr(`API请求失败，请检查网络后重试 \n data: ${data}`)
           } else {
 console.log('\n微客众智阅读文章成功,开始领取阅读奖励')
-        await $.wait(1000);
+        random = Math.floor(Math.random()*(max-min+1)+min)*1000
+        console.log("随机延时"+random+"毫秒");
+	      await $.wait(random); 
         await wkzzyd();
 } 
    
