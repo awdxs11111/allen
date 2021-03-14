@@ -1,301 +1,155 @@
 /*
-软件名称:云扫码 微信扫描二维码打开
-更新时间：2021-02-28 @肥皂
-脚本说明：云扫码自动阅读
-脚本为自动完成云扫码的阅读任务
-每日收益1元左右，可多号撸。提现秒到
-类似番茄看看，番茄看看黑了就跑云扫码，云扫码黑了就跑番茄看看
+软件名称:微客众智 微信扫描二维码打开
+更新时间：2021-03-13 @肥皂
+脚本说明：微客众智自动阅读
+脚本为自动完成微客众智的阅读任务
+每日收益0.6元左右，可多号撸。
+类似番茄看看和云扫码,貌似没有任务冲突
 哈哈哈啊哈哈哈哈
 
-任务打开二维码地址 https://raw.githubusercontent.com/age174/-/main/3B7C4F94-B961-4690-8DF7-B27998789124.png
-微信扫描打开，保存临时码，再去扫码获取数据
+复制链接到微信打开 http://i.hylks.xyz/i/632723?sharefrom=hall&_target=hall
+
+或者扫码打开 https://raw.githubusercontent.com/age174/-/main/507A2E9A-BE08-44D8-8BDC-B4F624763406.jpeg
+微信扫描打开
 
 
 
 本脚本以学习为主！
-首次运行脚本，会提示获取数据
-去云扫码，点击开始阅读，阅读几秒返回结算成功获取数据
+使用方法:扫码进去，点击任务大厅的阅读文章
+点击开始阅读，等待六秒返回获取数据
 
-TG电报群: https://t.me/hahaha802
+TG电报群: https://t.me/hahaha8028
+
 
 boxjs地址 :  
 
 https://raw.githubusercontent.com/age174/-/main/feizao.box.json
 
 
-云扫码
+微客众智
 圈X配置如下，其他软件自行测试，定时可以多设置几次，没任务会停止运行的
 [task_local]
-#云扫码
-15 12,14,16,20,22 * * * https://raw.githubusercontent.com/age174/-/main/ysm.js, tag=云扫码, img-url=https://s3.ax1x.com/2021/02/28/6CRWb8.jpg, enabled=true
+#微客众智
+5,35 9-22 * * * https://raw.githubusercontent.com/age174/-/main/wkzz.js, tag=微客众智, img-url=https://ae01.alicdn.com/kf/Uff0a0bb9e66a479591c9b02c176fd276A.jpg, enabled=true
 
 
 [rewrite_local]
-#云扫码
-^http://.*./yunonline/v1/ url script-request-body https://raw.githubusercontent.com/age174/-/main/ysm.js
+#微客众智
+^http://wx.tiantianaiyuedu.site/ url script-request-body https://raw.githubusercontent.com/age174/-/main/wkzz.js
 
 
 
 #loon
-^http://.*./yunonline/v1/ script-path=https://raw.githubusercontent.com/age174/-/main/ysm.js, requires-body=true, timeout=10, tag=云扫码
+http://wx.tiantianaiyuedu.site/ script-path=https://raw.githubusercontent.com/age174/-/main/wkzz.js, requires-body=true, timeout=10, tag=微客众智
 
 
 
 #surge
 
-云扫码 = type=http-request,pattern=^http://.*./yunonline/v1/,requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/age174/-/main/ysm.js,script-update-interval=0
+微客众智 = type=http-request,pattern=http://wx.tiantianaiyuedu.site/,requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/age174/-/main/wkzz.js,script-update-interval=0
 
 
 
 
 [MITM]
-hostname = .*.top
+hostname = wx.tiantianaiyuedu.site
 
 
 */
 
 
-const $ = new Env('云扫码自动阅读');
+const $ = new Env('微客众智自动阅读');
 let status;
-status = (status = ($.getval("ysmstatus") || "1") ) > 1 ? `${status}` : ""; // 账号扩展字符
-let ysmurlArr = [], ysmhdArr = [],ysmbodyArr = [],ysm2bodyArr = [],ysmtxArr = [],ysmcount = ''
-let ysmurl = $.getdata('ysmurl')
-let ysmhd = $.getdata('ysmhd')
-let ysmbody = $.getdata('ysmbody')
-let ysm2body = $.getdata('ysm2body')
-let ysmtx = $.getdata('ysmtx')
-let ysmkey = ''
-let max = 30;
-let min = 10;
-
+status = (status = ($.getval("wkzzstatus") || "1") ) > 1 ? `${status}` : ""; // 账号扩展字符
+let wkzzurlArr = [], wkzzhdArr = [],wkzzcount = ''
+let times = Math.round(Date.now() / 1000)
+let wkzzurl = $.getdata('wkzzurl')
+let wkzzhd = $.getdata('wkzzhd')
+let wkzzkey = '',id = '',uid='',tid='',name=''
+let max = 60
+let min = 17
 
 if ($.isNode()) {
-   if (process.env.YSM_URL && process.env.YSM_URL.indexOf('#') > -1) {
-   ysmurlArr = process.env.YSM_URL.split('#');
-   console.log(`您选择的是用"#"隔开\n`)
-  }
-  else if (process.env.YSM_URL && process.env.YSM_URL.indexOf('\n') > -1) {
-   ysmurlArr = process.env.YSM_URL.split('\n');
+  if (process.env.WKZZ_HD && process.env.WKZZ_HD.indexOf('\n') > -1) {
+   wkzzhdArr = process.env.WKZZ_HD.split('\n');
    console.log(`您选择的是用换行隔开\n`)
   } else {
-   ysmurlArr = process.env.YSM_URL.split()
+   wkzzhdArr = process.env.WKZZ_HD.split()
   };
-  if (process.env.YSM_HD && process.env.YSM_HD.indexOf('#') > -1) {
-   ysmhdArr = process.env.YSM_HD.split('#');
-   console.log(`您选择的是用"#"隔开\n`)
-  }
-  else if (process.env.YSM_HD && process.env.YSM_HD.indexOf('\n') > -1) {
-   ysmhdArr = process.env.YSM_HD.split('\n');
-   console.log(`您选择的是用换行隔开\n`)
-  } else {
-   ysmhdArr = process.env.YSM_HD.split()
-  };
-  if (process.env.YSM_BD && process.env.YSM_BD.indexOf('#') > -1) {
-   ysmbodyArr = process.env.YSM_BD.split('#');
-   console.log(`您选择的是用"#"隔开\n`)
-  }
-  else if (process.env.YSM_BD && process.env.YSM_BD.indexOf('\n') > -1) {
-   ysmbodyArr = process.env.YSM_BD.split('\n');
-   console.log(`您选择的是用换行隔开\n`)
-  } else {
-   ysmbodyArr = process.env.YSM_BD.split()
-  };	
-  if (process.env.YSM2_BD && process.env.YSM2_BD.indexOf('#') > -1) {
-   ysm2bodyArr = process.env.YSM2_BD.split('#');
-   console.log(`您选择的是用"#"隔开\n`)
-  }
-  else if (process.env.YSM2_BD && process.env.YSM2_BD.indexOf('\n') > -1) {
-   ysm2bodyArr = process.env.YSM2_BD.split('\n');
-   console.log(`您选择的是用换行隔开\n`)
-  } else {
-   ysm2bodyArr = process.env.YSM2_BD.split()
-  };		
-  if (process.env.YSM_TX && process.env.YSM_TX.indexOf('#') > -1) {
-   ysmtxArr = process.env.YSM_TX.split('#');
-   console.log(`您选择的是用"#"隔开\n`)
-  }
-  else if (process.env.YSM_TX && process.env.YSM_TX.indexOf('\n') > -1) {
-   ysmtxArr = process.env.YSM_TX.split('\n');
-   console.log(`您选择的是用换行隔开\n`)
-  } else {
-   ysmtxArr = process.env.YSM_TX.split()
-  };	
-	
+  
     console.log(`============ 脚本执行-国际标准时间(UTC)：${new Date().toLocaleString()}  =============\n`)
     console.log(`============ 脚本执行-北京时间(UTC+8)：${new Date(new Date().getTime() + 8 * 60 * 60 * 1000).toLocaleString()}  =============\n`)
- } else {ysmurlArr.push($.getdata('ysmurl'))
-    ysmhdArr.push($.getdata('ysmhd'))
-    ysmbodyArr.push($.getdata('ysmbody'))
-    ysm2bodyArr.push($.getdata('ysm2body'))
-    ysmtxArr.push($.getdata('ysmtx'))
-    let ysmcount = ($.getval('ysmcount') || '1');
-  for (let i = 2; i <= ysmcount; i++) {
-    ysmurlArr.push($.getdata(`ysmurl${i}`))
-    ysmhdArr.push($.getdata(`ysmhd${i}`))
-    ysmbodyArr.push($.getdata(`ysmbody${i}`))
-    ysm2bodyArr.push($.getdata(`ysm2body${i}`))
-    ysmtxArr.push($.getdata(`ysmtx${i}`))
+ } else {wkzzurlArr.push($.getdata('wkzzurl'))
+    wkzzhdArr.push($.getdata('wkzzhd'))
+    let wkzzcount = ($.getval('wkzzcount') || '1');
+  for (let i = 2; i <= wkzzcount; i++) {
+    wkzzurlArr.push($.getdata(`wkzzurl${i}`))
+    wkzzhdArr.push($.getdata(`wkzzhd${i}`))
   }
 }
 
 
-
 !(async () => {
-if (!ysmhdArr[0]) {
-    $.msg($.name, '【提示】请先获取云扫码一cookie')
+if (!wkzzhdArr[0]) {
+    $.msg($.name, '【提示】请先获取一cookie')
     return;
   }
-    console.log(`------------- 共${ysmhdArr.length}个账号-------------\n`)
-      for (let i = 0; i < ysmhdArr.length; i++) {
-        if (ysmhdArr[i]) {
+    console.log(`------------- 共${wkzzhdArr.length}个账号-------------\n`)
+      for (let i = 0; i < wkzzhdArr.length; i++) {
+        if (wkzzhdArr[i]) {
          
-          ysmurl = ysmurlArr[i];
-          ysmhd = ysmhdArr[i];
-          ysmbody = ysmbodyArr[i];
-          ysm2body = ysm2bodyArr[i];
-          ysmtx = ysmtxArr[i];
+          wkzzurl = wkzzurlArr[i];
+          wkzzhd = wkzzhdArr[i];
           $.index = i + 1;
-          console.log(`\n开始【云扫码${$.index}】`)
-    await ysm1();
+          console.log(`\n开始【微客众智${$.index}】`)
+    await wkzz1();
 
   }
-  //await ysmtx();
 }
 
 })()
   .catch((e) => $.logErr(e))
   .finally(() => $.done())
-//云扫码数据获取
+//微客众智数据获取
 
 
-function ysmck() {
-   if ($request.url.indexOf("v1/task") > -1) {
- const ysmurl = $request.url
-  if(ysmurl)     $.setdata(ysmurl,`ysmurl${status}`)
-    $.log(ysmurl)
-  const ysmhd = JSON.stringify($request.headers)
-        if(ysmhd)    $.setdata(ysmhd,`ysmhd${status}`)
-$.log(ysmhd)
-   const ysmbody = JSON.stringify($request.body)
-        if(ysmbody)    $.setdata(ysmbody,`ysmbody${status}`)
-$.log(ysmbody)
-   $.msg($.name,"",'云扫码'+`${status}` +'获取任务数据获取成功！')
+function wkzzck() {
+   if ($request.url.indexOf("wx.tiantianaiyuedu.site/read/article") > -1) {
+ const wkzzurl = $request.url
+  if(wkzzurl)     $.setdata(wkzzurl,`wkzzurl${status}`)
+    $.log(wkzzurl)
+  const wkzzhd = JSON.stringify($request.headers)
+        if(wkzzhd)    $.setdata(wkzzhd,`wkzzhd${status}`)
+$.log(wkzzhd)
+   $.msg($.name,"",'微客众智'+`${status}` +'数据获取成功！')
   }
-if ($request.url.indexOf("add_gold") > -1) {
- const ysm2body = $request.body
-  if(ysm2body)     $.setdata(ysm2body,`ysm2body${status}`)
-    $.log(ysm2body)
-$.msg($.name,"",'云扫码'+`${status}` +'提交任务数据获取成功！')
-   }
-  if ($request.url.indexOf("withdraw") > -1) {
- const ysmtx = $request.body
-  if(ysmtx)     $.setdata(ysmtx,`ysmtx${status}`)
-    $.log(ysmtx)
-$.msg($.name,"",'云扫码'+`${status}` +'微信提现数据获取成功！')
-   }
 }
 
 
-//云扫码领取
-function ysm3(timeout = 0) {
+
+//微客众智key
+function wkzz1(timeout = 0) {
   return new Promise((resolve) => {
+
 let url = {
-        url : "http:"+ysmurl.match(/http:(.*?)yunonline/)[1]+"yunonline/v1/add_gold",
-        headers : JSON.parse(ysmhd),
-        body : ysm2body,}
-      $.post(url, async (err, resp, data) => {
-        try {
-           
-    const result = JSON.parse(data)
-        if(result.errcode == 0){
-        console.log('\n云扫码领取阅读奖励回执:成功🌝 '+result.data.gold+'\n今日阅读次数: '+result.data.day_read+' 今日阅读奖励: '+result.data.day_gold+' 当前余额'+result.data.last_gold+'\n')
-        if(result.data.last_gold >= 3000){
-    console.log('\n检测到当前金额可提现，前去执行提现,请去抓取提现的数据，如果没有提现数据脚本会自行终止!')                
-await ysmdh();
-}       await $.wait(2000);
-        await ysm1();
+        url : "http://wx.tiantianaiyuedu.site/me",
+        headers : JSON.parse(wkzzhd),
         
-} else {
-       if(result.errcode == 405){
-console.log('\n🧼来自肥皂的提示:'+result.msg+'尝试继续执行任务')
-      await ysm1();
 }
-    console.log(result.errcode)
-console.log('\n云扫码领取阅读奖励回执:失败🚫 '+result.msg)
-}
-   
-        } catch (e) {
-          //$.logErr(e, resp);
-        } finally {
-          resolve()
-        }
-    },timeout)
-  })
-}
-
-//云扫码提交     
-function ysm2(timeout = 0) {
-  return new Promise((resolve) => {
-let url = {
-        url : ysmkey,
-        headers : JSON.parse(ysmhd),
-       
-}      
       $.get(url, async (err, resp, data) => {
+if(resp.statusCode == 301){
+$.log('\n微客众智访问失败，可能是Cookie过期或网络问题')
+}
         try {
-         //console.log('\n开始重定向跳转，跳转返回结果：'+data)
-        if (err) {
-          console.log(`\n${$.name} 🧼来自肥皂的提示:key请求提交失败,尝试重新执行任务`)
-     await ysm1();
-        } else {
-           
-    //const result = JSON.parse(data)
-       console.log('\n云扫码key提交成功,10秒后开始领取阅读奖励') 
-        random = Math.floor(Math.random()*(max-min+1)+min)*1000
-        console.log("随机延时"+random+"毫秒");
-	await $.wait(random);     
-        //await $.wait(9000);
-        await ysm3(); 
-       
-        }} catch (e) {
-          //$.logErr(e, resp);
-        } finally {
-          resolve()
-        }
-    },timeout)
-  })
-}
-
-
-//云扫码key
-function ysm1(timeout = 0) {
-  return new Promise((resolve) => {
-let url = {
-        url : "http:"+ysmurl.match(/http:(.*?)yunonline/)[1]+"yunonline/v1/task",
-        headers : JSON.parse(ysmhd),
-        body : 'secret='+ysmbody.match(/secret=(.*?)&/)[1]+'&type=read',
-}
-      $.post(url, async (err, resp, data) => {
-        try {
-      if(data == '{"errcode":0,"msg":"success"}'){
-       console.log('\n🧼来自肥皂的提示:当前没有任务啊,手动进云扫码看看是不是一直显示更新中,别问肥皂什么原因啦～')
-}
           //console.log(data)
     const result = JSON.parse(data)
-        if(result.errcode == 0){
-         //console.log(data)
-        console.log('\n云扫码获取key回执:成功🌝 开始 循环观看💦')
-      if(result.data.link === undefined){
-       console.log('\n🧼来自肥皂的提示:没有匹配到key'+result.data.msg)
-} else {
-        ysmkey = result.data.link
-        //$.log(ysmkey)
-        await $.wait(1000);
-        await ysm2();
-}
+        if(result.errors == false){
+   id = result.data.wxuser_id
+        console.log('\n微客众智获取用户信息成功\n当前用户名:'+result.data.nickname+' 用户ID:'+id+'\n开始查询任务信息')
+await wkzzlb();      
         
 } else {
-console.log('云扫码获取key回执:失败🚫 '+result.msg+' 已停止当前账号运行!')
+console.log('微客众智获取用户信息失败 已停止当前账号运行!')
 }
         } catch (e) {
           //$.logErr(e, resp);
@@ -307,26 +161,61 @@ console.log('云扫码获取key回执:失败🚫 '+result.msg+' 已停止当前�
 }
 
 
-//云扫码兑换
-function ysmdh(timeout = 0) {
+//微客众智任务列表
+function wkzzlb(timeout = 0) {
   return new Promise((resolve) => {
 
 let url = {
-        url : "http:"+ysmurl.match(/http:(.*?)yunonline/)[1]+"yunonline/v1/user_gold",
-        headers : JSON.parse(ysmhd),
-        body : 'openid='+ysmtx.match(/openid=(.*?)ua/)[1]+'gold=3000',
+        url : "http://wx.tiantianaiyuedu.site/read/tasks?times=0.350527818069823",
+        headers : JSON.parse(wkzzhd),
+       
 }
-      $.post(url, async (err, resp, data) => {
+      $.get(url, async (err, resp, data) => {
+
         try {
-           
     const result = JSON.parse(data)
-        if(result.errcode == 0){
-        console.log('\n云扫码提现兑换:成功🌝 兑换金额'+result.data.money+'元，前去微信提现')
+
+        if(result.data.code== 1){
+uid=data.match(/"id":(.*?),/)[1]
+tid =data.match(/"a_id":(.*?),/)[1]
+name =data.match(/"content_url":"(.*?)",/)[1]
+
+        console.log('\n微客众智获取任务ID成功\n当前任务ID: '+uid+' '+tid+'\n开始循环阅读:')
+        random = Math.floor(Math.random()*(max-min+1)+min)*1000
+        console.log("随机延时"+random+"毫秒");
+        await $.wait(random); 
+        await wkzzyd();
+} else {
+       console.log('\n微客众智获取任务ID失败  '+result.data.message)
+}
+   
+        } catch (e) {
+          //$.logErr(e, resp);
+        } finally {
+          resolve()
+        }
+    },timeout)
+  })
+}
+
+//微客众智阅读文章
+function wkzzwz(timeout = 0) {
+  return new Promise((resolve) => {
+
+let url = {
+        url : 'http://mp.weixin.qq.com/s?__biz='+name.match(/biz=(.*)/)[1],
+        headers : JSON.parse(wkzzhd),
+       
+}
+      $.get(url, async (err, resp, data) => {
+        try {
+        if (err) {
+            $.logErr(`API请求失败，请检查网络后重试 \n data: ${data}`)
+          } else {
+console.log('\n微客众智阅读文章成功,开始领取阅读奖励')
         await $.wait(1000);
-        await ysmwx();
-} else {
-       console.log('\n云扫码提现兑换:失败🚫 '+result.msg)
-}
+        await wkzzyd();
+} 
    
         } catch (e) {
           //$.logErr(e, resp);
@@ -336,25 +225,24 @@ let url = {
     },timeout)
   })
 }
-
-
-//云扫码提现
-function ysmwx(timeout = 0) {
+//微客众智提交
+function wkzzyd(timeout = 0) {
   return new Promise((resolve) => {
 let url = {
-        url : "http:"+ysmurl.match(/http:(.*?)yunonline/)[1]+"yunonline/v1/withdraw",
-        headers : JSON.parse(ysmhd),
-        body : ysmtx,}
+        url : "http://wx.tiantianaiyuedu.site/read/article",
+        headers : JSON.parse(wkzzhd),
+        body : `{"data":{"wxuser_id":${id},"receive_article_id":${tid} ,"article_created_at":${times},"task_id": ${uid}}}`,
+}
       $.post(url, async (err, resp, data) => {
         try {
            
     const result = JSON.parse(data)
-        if(result.errcode == 0){
-        console.log('\n云扫码微信提现回执:成功🌝 '+result.msg)
-        $.msg($.name,"",'云扫码已成功提现至微信0.3元')
-        await ysm1();
+        if(result.errors == false){
+        console.log('\n微客众智任务提交成功:'+result.message)
+await wkzzxx();
+       
 } else {
-       console.log('\n云扫码微信提现回执:失败🚫 '+result.msg)
+       console.log('\n微客众智任务提交失败 '+data)
 }
    
         } catch (e) {
@@ -366,6 +254,37 @@ let url = {
   })
 }
 
+
+//微客众智信息
+function wkzzxx(timeout = 0) {
+  return new Promise((resolve) => {
+
+let url = {
+        url : "http://wx.tiantianaiyuedu.site/account/income_info?times=0.7346913820791053",
+        headers : JSON.parse(wkzzhd),
+       
+}
+      $.get(url, async (err, resp, data) => {
+        try {
+           
+    const result = JSON.parse(data)
+        if(result.errors == false){
+
+        console.log('\n微客众智获取用户信息成功\n当前阅读次数: '+result.data.read_task_count+' '+'\n当前余额'+result.data.read_money+'开始获取任务')
+        await $.wait(5000);
+        await wkzzlb();
+} else {
+       console.log('\n微客众智获取用户信息失败 '+result.msg)
+}
+   
+        } catch (e) {
+          //$.logErr(e, resp);
+        } finally {
+          resolve()
+        }
+    },timeout)
+  })
+}
 
 
 
