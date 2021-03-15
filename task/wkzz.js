@@ -181,10 +181,11 @@ tid =data.match(/"a_id":(.*?),/)[1]
 name =data.match(/"content_url":"(.*?)",/)[1]
 
         console.log('\n微客众智获取任务ID成功\n当前任务ID: '+uid+' '+tid+'\n开始循环阅读:')
-        random = Math.floor(Math.random()*(max-min+1)+min)*1000
+        await $.wait(1000);
+        /*random = Math.floor(Math.random()*(max-min+1)+min)*1000
         console.log("随机延时"+random+"毫秒");
-        await $.wait(random); 
-        await wkzzyd();
+        await $.wait(random); */
+        await wkzzwz();
 } else {
        console.log('\n微客众智获取任务ID失败  '+result.data.message)
 }
@@ -213,7 +214,10 @@ let url = {
             $.logErr(`API请求失败，请检查网络后重试 \n data: ${data}`)
           } else {
 console.log('\n微客众智阅读文章成功,开始领取阅读奖励')
-        await $.wait(1000);
+        //await $.wait(1000);
+        random = Math.floor(Math.random()*(max-min+1)+min)*1000
+        console.log("随机延时"+random+"毫秒");
+        await $.wait(random); 
         await wkzzyd();
 } 
    
