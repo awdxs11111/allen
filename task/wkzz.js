@@ -234,7 +234,8 @@ function wkzzyd(timeout = 0) {
 let url = {
         url : "http://wx.tiantianaiyuedu.site/read/article",
         headers : JSON.parse(wkzzhd),
-        body : `{"data":{"wxuser_id":${id},"receive_article_id":${tid} ,"article_created_at":${times},"task_id": ${uid}}}`,
+        //body : `{"data":{"wxuser_id":${id},"receive_article_id":${tid} ,"article_created_at":${times},"task_id": ${uid}}}`,
+        body : "{"data":{"wxuser_id":${id},"receive_article_id":${tid} ,"article_created_at":${times},"task_id": ${uid}}}"
 }
       $.post(url, async (err, resp, data) => {
         try {
@@ -250,7 +251,7 @@ await wkzzxx();
 }
    
         } catch (e) {
-          //$.logErr(e, resp);
+          $.logErr(e, resp);
         } finally {
           resolve()
         }
