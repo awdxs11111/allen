@@ -236,9 +236,9 @@ function wkzzyd(timeout = 0) {
 let url = {
         url : `http://wx.tiantianaiyuedu.site/read/article`,
         headers : JSON.parse(wkzzhd),
-        //body : `{"data":{"wxuser_id":${id},"receive_article_id":${tid},"article_created_at":${times},"task_id": ${uid}}}`,
+        body : `{"data":{"wxuser_id":${id},"receive_article_id":${tid},"article_created_at":${times},"task_id": ${uid}}}`,
         //body : wkzzbd
-        body : {"data":{"wxuser_id":634701,"receive_article_id":894720,"article_created_at":1613838424,"task_id":987758}}
+        //body : {"data":{"wxuser_id":634701,"receive_article_id":894720,"article_created_at":1613838424,"task_id":987758}}
 }
       $.post(url, async (err, resp, data) => {
         try {
