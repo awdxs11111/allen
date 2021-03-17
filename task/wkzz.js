@@ -184,6 +184,9 @@ name =data.match(/"content_url":"(.*?)",/)[1]
 
         console.log('\n微客众智获取任务ID成功\n当前任务ID: '+uid+' '+tid+'\n开始循环阅读:')
         await $.wait(1000);
+        random = Math.floor(Math.random()*(max-min+1)+min)*1000
+        console.log("随机延时"+random+"毫秒");
+        await $.wait(random);
         await wkzzyd();
 } else {
        console.log('\n微客众智获取任务ID失败  '+result.data.message)
