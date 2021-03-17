@@ -241,9 +241,8 @@ let url = {
 }
       $.post(url, async (err, resp, data) => {
         try {
-      const result = data
-    //const result = JSON.parse(data)
-      console.log(data)
+      const result = JSON.parse(data)
+      //console.log(data)
         if(result.errors == false){
         console.log('\n微客众智任务提交成功:'+result.message)
 await wkzzxx();
