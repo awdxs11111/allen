@@ -230,8 +230,8 @@ let url = {
 }
 //微客众智提交
 function wkzzyd(timeout = 0) {
-  wkzzbd=`{"data":{"wxuser_id":${id},"receive_article_id":${tid},"article_created_at":${times},"task_id": ${uid}}}`
-  console.log(wkzzbd)
+  //wkzzbd=`{"data":{"wxuser_id":${id},"receive_article_id":${tid},"article_created_at":${times},"task_id": ${uid}}}`
+  //console.log(wkzzbd)
   return new Promise((resolve) => {
 let url = {
         url : `http://wx.tiantianaiyuedu.site/read/article`,
