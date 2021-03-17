@@ -237,7 +237,7 @@ let url = {
         url : "http://wx.tiantianaiyuedu.site/read/article",
         headers : JSON.parse(wkzzhd),
         //body : `{"data":{"wxuser_id":${id},"receive_article_id":${tid} ,"article_created_at":${times},"task_id": ${uid}}}`,
-        body : JSON.parse(wkzzbd)
+        body : wkzzbd
 }
       $.post(url, async (err, resp, data) => {
         try {
