@@ -184,6 +184,9 @@ name =data.match(/"content_url":"(.*?)",/)[1]
 
         console.log('\n微客众智获取任务ID成功\n当前任务ID: '+uid+' '+tid+'\n开始循环阅读:')
         await $.wait(1000);
+        random = Math.floor(Math.random()*(max-min+1)+min)*1000
+        console.log("随机延时"+random+"毫秒");
+        await $.wait(random);
         await wkzzyd();
 } else {
        console.log('\n微客众智获取任务ID失败  '+result.data.message)
@@ -230,16 +233,20 @@ let url = {
 }
 //微客众智提交
 function wkzzyd(timeout = 0) {
+  //wkzzbd=`{"data":{"wxuser_id":${id},"receive_article_id":${tid},"article_created_at":${times},"task_id": ${uid}}}`
+  //console.log(wkzzbd)
   return new Promise((resolve) => {
 let url = {
-        url : "http://wx.tiantianaiyuedu.site/read/article",
+        url : `http://wx.tiantianaiyuedu.site/read/article`,
         headers : JSON.parse(wkzzhd),
-        body : `{"data":{"wxuser_id":${id},"receive_article_id":${tid} ,"article_created_at":${times},"task_id": ${uid}}}`,
+        body : `{"data":{"wxuser_id":${id},"receive_article_id":${tid},"article_created_at":${times},"task_id": ${uid}}}`,
+        //body : wkzzbd
+        //body : {"data":{"wxuser_id":634701,"receive_article_id":894720,"article_created_at":1613838424,"task_id":987758}}
 }
       $.post(url, async (err, resp, data) => {
         try {
-           
-    const result = JSON.parse(data)
+      const result = JSON.parse(data)
+      //console.log(data)
         if(result.errors == false){
         console.log('\n微客众智任务提交成功:'+result.message)
 await wkzzxx();
@@ -250,7 +257,7 @@ await wkzzxx();
 }
    
         } catch (e) {
-          //$.logErr(e, resp);
+          $.logErr(e, resp);
         } finally {
           resolve()
         }

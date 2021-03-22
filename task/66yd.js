@@ -1,147 +1,202 @@
 /*
-软件名称:哈喽短视频 微信小程序
-更新时间：2021-03-09 @肥皂
-脚本说明：哈喽短视频
-脚本为自动签到和领取视频红包
+软件名称:66阅读 微信扫描二维码打开
+更新时间：2021-03-18 @肥皂
+脚本说明：66阅读自动阅读
+脚本为自动完成66阅读的阅读任务
 
-小程序二维码地址 https://raw.githubusercontent.com/age174/-/main/DCB00CEE-FFFF-427B-B7ED-7381DE584860.jpeg
+👏👏👏66阅读
+
+
+复制链接到微信打开 http://pmlyd.cn//user/tasks?mid=3R6QKMRXU
+
+或者扫码打开 https://raw.githubusercontent.com/age174/-/main/515B51D0-2B22-4886-9291-FDCB1A8822B1.jpeg
+微信扫描打开
+
 
 本脚本以学习为主！
-使用方法:
-打开哈喽短视频小程序，点击任务，完成“观看完整视频”获取数据
+使用方法:扫码进去，点击任务大厅的阅读文章
+点击开始阅读，获得66阅读数据
 
-//打开哈喽短视频小程序，点击我的或者任务获取数据
+TG电报群: https://t.me/hahaha8028
 
-TG电报群: https://t.me/hahaha802
 
 boxjs地址 :  
 
 https://raw.githubusercontent.com/age174/-/main/feizao.box.json
 
 
-哈喽短视频
+66阅读
 圈X配置如下，其他软件自行测试，定时可以多设置几次，没任务会停止运行的
 [task_local]
-#哈喽短视频
-15 13 * * * https://raw.githubusercontent.com/age174/-/main/hldsp.js, tag=哈喽短视频, img-url=https://ae01.alicdn.com/kf/Uda8ecbbe50444fe293b538cbccf9d719q.jpg, enabled=true
+#66阅读
+5,35 9-22 * * * https://raw.githubusercontent.com/age174/-/main/66yd.js, tag=66阅读, img-url=https://ae01.alicdn.com/kf/Uaade4566dd3744299956aa883f225386u.jpg, enabled=true
 
 
 [rewrite_local]
-#哈喽短视频
-https://vip.75787.com/app/index.php url script-request-header https://raw.githubusercontent.com/age174/-/main/hldsp.js
+#66阅读
+http://v1uxnzj.cn/v4/user/get_user_task? url script-request-header https://raw.githubusercontent.com/age174/-/main/66yd.js
 
 
 
 #loon
-https://vip.75787.com/app/index.php script-path=https://raw.githubusercontent.com/age174/-/main/hldsp.js, requires-header=true, timeout=10, tag=哈喽短视频
+http://v1uxnzj.cn/v4/user/get_user_task? script-path=https://raw.githubusercontent.com/age174/-/main/66yd.js, requires-header=true, timeout=10, tag=66阅读
 
 
 
 #surge
 
-哈喽短视频 = type=http-request,pattern=https://vip.75787.com/app/index.php,requires-header=1,max-size=0,script-path=https://raw.githubusercontent.com/age174/-/main/hldsp.js,script-update-interval=0
+66阅读 = type=http-request,pattern=http://v1uxnzj.cn/v4/user/get_user_task?,requires-header=1,max-size=0,script-path=https://raw.githubusercontent.com/age174/-/main/66yd.js,script-update-interval=0
 
 
 
 
 [MITM]
-hostname = vip.75787.com
+hostname = v1uxnzj.cn
 
 
 */
 
 
-const $ = new Env('哈喽短视频');
+const $ = new Env('66阅读自动阅读');
 let status;
-status = (status = ($.getval("hldspstatus") || "1") ) > 1 ? `${status}` : ""; // 账号扩展字符
-let hldspurlArr = [], hldsphdArr = [],hldspcount = ''
-let hldspurl = $.getdata('hldspurl')
-let hldsphd = $.getdata('hldsphd')
-let hlsign = '',hluid = ''
+status = (status = ($.getval("llydstatus") || "1") ) > 1 ? `${status}` : ""; // 账号扩展字符
+let llydurlArr = [], llydhdArr = [],llydcount = ''
+let times = Math.round(Date.now() / 1000)
+let llydurl = $.getdata('llydurl')
+let llydhd = $.getdata('llydhd')
+let llydkey = '',id = '',uid='',tid='',name=''
+let max = 40
+let min = 12
 
 if ($.isNode()) {
-  if (process.env.HLDSP_URL && process.env.HLDSP_URL.indexOf('\n') > -1) {
-   hldspurlArr = process.env.HLDSP_URL.split('\n');
+   if (process.env.LLYD_URL && process.env.LLYD_URL.indexOf('\n') > -1) {
+   llydurlArr = process.env.LLYD_URL.split('\n');
    console.log(`您选择的是用换行隔开\n`)
   } else {
-   hldspurlArr = process.env.HLDSP_URL.split()
+   llydurlArr = process.env.LLYD_URL.split()
   };
-  if (process.env.HLDSP_HD && process.env.HLDSP_HD.indexOf('\n') > -1) {
-   hldsphdArr = process.env.HLDSP_HD.split('\n');
+
+  if (process.env.LLYD_HD && process.env.LLYD_HD.indexOf('\n') > -1) {
+   llydhdArr = process.env.LLYD_HD.split('\n');
    console.log(`您选择的是用换行隔开\n`)
   } else {
-   hldsphdArr = process.env.HLDSP_HD.split()
+   llydhdArr = process.env.LLYD_HD.split()
   };
-	
+
     console.log(`============ 脚本执行-国际标准时间(UTC)：${new Date().toLocaleString()}  =============\n`)
     console.log(`============ 脚本执行-北京时间(UTC+8)：${new Date(new Date().getTime() + 8 * 60 * 60 * 1000).toLocaleString()}  =============\n`)
- } else {hldspurlArr.push($.getdata('hldspurl'))
-    hldsphdArr.push($.getdata('hldsphd'))
-    let hldspcount = ($.getval('hldspcount') || '1');
-  for (let i = 2; i <= hldspcount; i++) {
-    hldspurlArr.push($.getdata(`hldspurl${i}`))
-    hldsphdArr.push($.getdata(`hldsphd${i}`))
+ }else {llydurlArr.push($.getdata('llydurl'))
+    llydhdArr.push($.getdata('llydhd'))
+    let llydcount = ($.getval('llydcount') || '1');
+  for (let i = 2; i <= llydcount; i++) {
+    llydurlArr.push($.getdata(`llydurl${i}`))
+    llydhdArr.push($.getdata(`llydhd${i}`))
   }
 }
 
 !(async () => {
-if (!hldsphdArr[0]) {
+if (!llydhdArr[0]) {
     $.msg($.name, '【提示】请先获取一cookie')
     return;
   }
-    console.log(`------------- 共${hldsphdArr.length}个账号-------------\n`)
-      for (let i = 0; i < hldsphdArr.length; i++) {
-        if (hldsphdArr[i]) {
+    console.log(`------------- 共${llydhdArr.length}个账号-------------\n`)
+      for (let i = 0; i < llydhdArr.length; i++) {
+        if (llydhdArr[i]) {
          
-          hldspurl = hldspurlArr[i];
-          hldsphd = hldsphdArr[i];
+          llydurl = llydurlArr[i];
+          llydhd = llydhdArr[i];
           $.index = i + 1;
-          console.log(`\n开始【哈喽短视频${$.index}】`)
-          //await hldspsp();
-            await hldspqd();
-            
+          console.log(`\n开始【66阅读${$.index}】`)
+          await llydlb();
+          
+
   }
 }
 
 })()
   .catch((e) => $.logErr(e))
   .finally(() => $.done())
-//哈喽短视频数据获取
+//66阅读数据获取
 
 
-function hldspck() {
-   if ($request.url.indexOf("dorenwu") > -1) {
- const hldspurl = $request.url
-  if(hldspurl)     $.setdata(hldspurl,`hldspurl${status}`)
-    $.log(hldspurl)
-  const hldsphd = JSON.stringify($request.headers)
-        if(hldsphd)    $.setdata(hldsphd,`hldsphd${status}`)
-$.log(hldsphd)
-   $.msg($.name,"",'哈喽短视频'+`${status}` +'数据获取成功！')
+function llydck() {
+   if ($request.url.indexOf("task") > -1) {
+ const llydurl = $request.url
+  if(llydurl)     $.setdata(llydurl,`llydurl${status}`)
+    $.log(llydurl)
+  const llydhd = JSON.stringify($request.headers)
+        if(llydhd)    $.setdata(llydhd,`llydhd${status}`)
+$.log(llydhd)
+   $.msg($.name,"",'66阅读'+`${status}` +'数据获取成功！')
   }
 }
 
 
-//哈喽短视频红包
-function hldspsp(timeout = 0) {
+
+
+
+
+//66阅读任务列表
+function llydlb(timeout = 0) {
+  return new Promise((resolve) => {
+uid=llydurl.match(/uid=(.*?)&/)[1]
+tid =llydurl.match(/token=(.*?)&/)[1]
+
+//$.log(tid)
+
+let url = {
+        url : `http://v1uxnzj.cn/v4/user/get_user_task?uid=${uid}&login_token=${tid}&t=${times}`,
+        headers : JSON.parse(llydhd),
+       
+}
+      $.get(url, async (err, resp, data) => {
+
+        try {
+    const result = JSON.parse(data)
+
+        if(result.code== 100000){
+
+name = result.data.task[0].url
+key = result.data.task[0].tid
+        console.log('\n66阅读获取任务ID成功\n当前任务ID: '+key+'\n开始提交key:')
+        await $.wait(1000);
+        await llydyd();
+} else {
+       console.log('\n66阅读获取任务ID失败  '+result.msg)
+await llydwz();
+}
+   
+        } catch (e) {
+          //$.logErr(e, resp);
+        } finally {
+          resolve()
+        }
+    },timeout)
+  })
+}
+
+
+//66阅读key
+function llydyd(timeout = 0) {
   return new Promise((resolve) => {
 let url = {
-        url : 'https://vip.75787.com/app/index.php?i=3&t=0&v=1.1.47&from=wxapp&c=entry&a=wxapp&do=dorenwu&m=luobo_video&sign='+hlsign+'&uid='+hluid,
-        headers : JSON.parse(hldsphd),
-        }
-      $.get(url, async (err, resp, data) => {
+        url : "http://v1uxnzj.cn/v4/user/startTask",
+        headers : JSON.parse(llydhd),
+        body : `uid=${uid}&login_token=${tid}&tid=${key}&time=${times}&url=${name}`,
+}
+      $.post(url, async (err, resp, data) => {
         try {
            
     const result = JSON.parse(data)
-        if(result.data !== 0){
-        console.log('\n哈喽短视频[领取视频红包]回执:成功🌝 \n获得视频奖励: '+result.data+'等待20秒继续领取')
-           await $.wait(20000);
-           await hldspsp();
-       
-        
+        if(result.code == 100000){
+        console.log('\n66阅读key提交成功:'+result.msg)
+       await $.wait(1000)
+        random = Math.floor(Math.random()*(max-min+1)+min)*1000
+        console.log("随机延时"+random+"毫秒");
+        await $.wait(random);
+       await llydtj()
 } else {
-     
-console.log('\n哈喽短视频[领取视频红包]回执:失败🚫')
+       console.log('\n66阅读key提交失败 '+result.msg)
 
 }
    
@@ -155,29 +210,57 @@ console.log('\n哈喽短视频[领取视频红包]回执:失败🚫')
 }
 
 
-//哈喽短视频签到
-function hldspqd(timeout = 0) {
+//66阅读提交
+function llydtj(timeout = 0) {
   return new Promise((resolve) => {
-hlsign = hldspurl.match(/sign=(\w+)/)[1]
-hluid = hldspurl.match(/uid=(\w.+)/)[1]
 let url = {
-        url : 'https://vip.75787.com/app/index.php?i=3&t=0&v=1.1.47&from=wxapp&c=entry&a=wxapp&do=Doqiandao&m=luobo_video&sign='+hlsign+'&uid='+hluid,
-        headers : JSON.parse(hldsphd),
-        
+        url : "http://v1uxnzj.cn/v4/msg/task_type_statistics_count",
+        headers : JSON.parse(llydhd),
+        body : `uid=${uid}&login_token=${tid}&type=11&tid=${key}`,
 }
-      $.get(url, async (err, resp, data) => {
+      $.post(url, async (err, resp, data) => {
         try {
+           
     const result = JSON.parse(data)
-        if(result.errno == 0){
-        console.log('\n哈喽短视频[签到]回执:成功🌝  \n获得金币:'+result.data.price)
-     //$.done()
-       await $.wait(2000);
-        await hldspsp();
-        
+        if(result.code == 100000){
+        await $.wait(8000)
+       await llydrw()
+       
+       
 } else {
-console.log('哈喽短视频[签到]回执:失败🚫 '+result.message)
-     await hldspsp();
+       console.log('\n66阅读未知错误')
+
 }
+   
+        } catch (e) {
+          //$.logErr(e, resp);
+        } finally {
+          resolve()
+        }
+    },timeout)
+  })
+}
+//66阅读提交任务
+function llydrw(timeout = 0) {
+  return new Promise((resolve) => {
+let url = {
+        url : "http://v1uxnzj.cn/v4/user/wxfinishTask",
+        headers : JSON.parse(llydhd),
+        body : `uid=${uid}&login_token=${tid}&tid=${key}&time=${times}&url=${name}`,
+}
+      $.post(url, async (err, resp, data) => {
+        try {
+           
+    const result = JSON.parse(data)
+        if(result.code == 100000){
+        console.log('\n66阅读任务提交成功:\n获得积分: '+result.data.curr_money+'元\n今日阅读积分:'+result.data.money+'元\n今日成功阅读:'+result.data.check+'篇文章')
+       await $.wait(1000)
+       await llydlb()
+} else {
+       console.log('\n66阅读任务提交失败 '+result.msg+result.code)
+
+}
+   
         } catch (e) {
           //$.logErr(e, resp);
         } finally {

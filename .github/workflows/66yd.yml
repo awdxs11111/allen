@@ -1,10 +1,10 @@
-name: hldsp
+name: 66yd
 
 
 on:
   workflow_dispatch:
   schedule:
-     - cron: '23 3 * * *'
+     - cron: '16 1-13 * * *'
   watch:
     types: started
 jobs:
@@ -12,8 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.repository.owner.id == github.event.sender.id
     env:
-        HLDSP_URL: ${{ secrets.HLDSP_URL }}
-        HLDSP_HD: ${{ secrets.HLDSP_HD }}       
+        LLYD_URL: ${{ secrets.LLYD_URL }}  
+        LLYD_HD: ${{ secrets.LLYD_HD }}          
         TZ: Asia/shanghai
     steps:
       - name: Checkout
@@ -26,10 +26,10 @@ jobs:
       - name: npm install
         run: |
           npm install
-      - name: '运行 【hldsp】'
-        if: env.HLDSP_HD
+      - name: '运行 【66yd】'
+        if: env.LLYD_HD
         run: |
-          node task/hldsp.js
+          node task/66yd.js
         env:
           PUSH_KEY: ${{ secrets.PUSH_KEY }}
           BARK_PUSH: ${{ secrets.BARK_PUSH }}
